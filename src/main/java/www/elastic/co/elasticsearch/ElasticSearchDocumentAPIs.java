@@ -1,13 +1,13 @@
 package www.elastic.co.elasticsearch;
 
 import org.apache.http.HttpHost;
+import org.apache.lucene.search.TermQuery;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.get.*;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateRequest;
@@ -254,6 +254,32 @@ public class ElasticSearchDocumentAPIs {
                             bulkItemResponse.getFailure();
                     System.out.println(failure.getMessage());
                 }
+            }
+        }
+
+        client.close();
+    }
+
+
+    /**
+     * Multi-Get API
+     * 在单个http请求里面，MGet 可以执行多个  get请求
+     */
+    @Test
+    public void test10() throws IOException {
+        MultiGetRequest request = new MultiGetRequest();
+        request.add(new MultiGetRequest.Item(
+                "test",
+                "user",
+                "4"
+        ));
+        request.add(new MultiGetRequest.Item("test", "user", "6"));
+        MultiGetResponse responses  = client.mget(request, RequestOptions.DEFAULT);
+        for (MultiGetItemResponse itemResponse : responses) {
+            GetResponse response = itemResponse.getResponse();
+            if (response.isExists()) {
+                String sourceAsString = response.getSourceAsString();
+                System.out.println(sourceAsString);
             }
         }
 

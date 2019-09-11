@@ -1,6 +1,9 @@
 package www.elastic.co.elasticsearch;
 
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.bulk.BulkItemResponse;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -225,6 +228,35 @@ public class ElasticSearchDocumentAPIs {
         DeleteResponse deleteResponse =
                 client.delete(deleteRequest, RequestOptions.DEFAULT);
         System.out.println(deleteResponse.status());
+        client.close();
+    }
+
+
+    /**
+     * 一个请求可以做多个操作
+     * <p>
+     * bulk api  批量请求
+     */
+    @Test
+    public void test9() throws IOException {
+        BulkRequest request = new BulkRequest();
+        request.add(new IndexRequest("posts", "doc", "1")
+                .source(XContentType.JSON, "field", "foo"));
+        request.add(new IndexRequest("posts", "doc", "2")
+                .source(XContentType.JSON, "field", "bar"));
+        request.add(new IndexRequest("posts", "doc", "3")
+                .source(XContentType.JSON, "field", "baz"));
+        BulkResponse bulkResponse = client.bulk(request, RequestOptions.DEFAULT);
+        if (bulkResponse.hasFailures()) {
+            for (BulkItemResponse bulkItemResponse : bulkResponse) {
+                if (bulkItemResponse.isFailed()) {
+                    BulkItemResponse.Failure failure =
+                            bulkItemResponse.getFailure();
+                    System.out.println(failure.getMessage());
+                }
+            }
+        }
+
         client.close();
     }
 

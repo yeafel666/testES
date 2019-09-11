@@ -5,12 +5,15 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -151,6 +154,59 @@ public class ElasticSearchDocumentAPIs {
 
         client.close();
     }
+
+
+    /**
+     * exist api   查看数据是否存在
+     * @throws IOException
+     */
+    @Test
+    public void test6() throws IOException {
+        GetRequest getRequest = new GetRequest(
+                "posts",
+                "doc",
+                "1"
+        );
+        getRequest.fetchSourceContext(new FetchSourceContext(false));
+        getRequest.storedFields("_none_");
+
+        boolean exists = client.exists(getRequest, RequestOptions.DEFAULT);
+
+        if (exists) {
+            System.out.println("存在");
+        } else {
+            System.out.println("不存在");
+        }
+
+        client.close();
+    }
+
+
+    /**
+     * update api
+     * @throws IOException
+     */
+    @Test
+    public void test7() throws IOException {
+        UpdateRequest request = new UpdateRequest(
+                "posts",
+                "doc",
+                "1"
+        );
+        String jsonString = "{\n" +
+                "\t\n" +
+                "\t\"updated\" : \"2017-01-01\",\n" +
+                "\t\"reason\" : \"daily update\"\n" +
+                "} ";
+        request.doc(jsonString, XContentType.JSON);
+
+        UpdateResponse updateResponse = client.update(
+                request, RequestOptions.DEFAULT
+        );
+        System.out.println(updateResponse.getResult());
+        client.close();
+    }
+
 
 
 

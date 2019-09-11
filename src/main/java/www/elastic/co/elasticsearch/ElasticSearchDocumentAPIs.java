@@ -1,6 +1,8 @@
 package www.elastic.co.elasticsearch;
 
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -206,6 +208,26 @@ public class ElasticSearchDocumentAPIs {
         System.out.println(updateResponse.getResult());
         client.close();
     }
+
+
+    /**
+     * delete api
+     * 注意： es删除只是标记删除，查询不到了。但不会马上从es里面删掉。
+     * @throws IOException
+     */
+    @Test
+    public void test8() throws IOException {
+        DeleteRequest deleteRequest = new DeleteRequest(
+                "posts",
+                "doc",
+                "1"
+        );
+        DeleteResponse deleteResponse =
+                client.delete(deleteRequest, RequestOptions.DEFAULT);
+        System.out.println(deleteResponse.status());
+        client.close();
+    }
+
 
 
 

@@ -1,6 +1,8 @@
 package www.elastic.co.elasticsearch;
 
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -126,6 +128,26 @@ public class ElasticSearchDocumentAPIs {
         IndexResponse indexResponse = client.index(request, RequestOptions.DEFAULT);
 
         System.out.println(indexResponse.getId());
+
+        client.close();
+    }
+
+
+    /**
+     * get api
+     * @throws IOException
+     */
+    @Test
+    public void test5() throws IOException {
+        GetRequest getRequest = new GetRequest(
+                "posts",
+                "doc",
+                "1"
+        );
+
+        GetResponse getResponse = client.get(getRequest, RequestOptions.DEFAULT);
+
+        System.out.println(getResponse.getSource());
 
         client.close();
     }
